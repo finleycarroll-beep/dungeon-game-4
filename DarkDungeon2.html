@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dark Dungeon</title>
+
+<style>
+body{
+margin:0;
+background:#000;
+color:#00ff9d;
+font-family:monospace;
+text-align:center;
+}
+
+canvas{
+border:3px solid #00ff9d;
+image-rendering: pixelated;
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Dark Dungeon</h2>
+<p>Move: WASD | Attack: Space</p>
+
+<canvas id="game" width="640" height="480"></canvas>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const tile = 32;
+
+const map=[
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+let player={x:2,y:2,hp:100};
+
+let monsters=[
+{x:10,y:4,hp:30},
+{x:7,y:5,hp:30}
+];
+
+function drawFloor(x,y){
+ctx.fillStyle="#1a1a1a";
+ctx.fillRect(x*tile,y*tile,tile,tile);
+
+ctx.fillStyle="#222";
+ctx.fillRect(x*tile+4,y*tile+4,24,24);
+}
+
+function drawWall(x,y){
+ctx.fillStyle="#444";
+ctx.fillRect(x*tile,y*tile,tile,tile);
+
+ctx.fillStyle="#555";
+ctx.fillRect(x*tile+4,y*tile+4,24,24);
+}
+
+function drawPlayer(x,y){
+ctx.fillStyle="#00e5ff";
+ctx.fillRect(x*tile+8,y*tile+6,16,20);
+
+ctx.fillStyle="#fff";
+ctx.fillRect(x*tile+12,y*tile+10,4,4);
+ctx.fillRect(x*tile+16,y*tile+10,4,4);
+}
+
+function drawMonster(x,y){
+ctx.fillStyle="#6aff6a";
+ctx.fillRect(x*tile+6,y*tile+8,20,18);
+
+ctx.fillStyle="#000";
+ctx.fillRect(x*tile+10,y*tile+12,4,4);
+ctx.fillRect(x*tile+16,y*tile+12,4,4);
+}
+
+function draw(){
+
+ctx.fillStyle="black";
+ctx.fillRect(0,0,640,480);
+
+for(let y=0;y<map.length;y++){
+for(let x=0;x<map[y].length;x++){
+
+if(map[y][x]==1)
+drawWall(x,y);
+else
+drawFloor(x,y);
+
+}
+}
+
+drawPlayer(player.x,player.y);
+
+monsters.forEach(m=>{
+if(m.hp>0)
+drawMonster(m.x,m.y);
+});
+
+ctx.fillStyle="white";
+ctx.fillText("HP: "+player.hp,10,470);
+
+}
+
+function move(dx,dy){
+
+let nx=player.x+dx;
+let ny=player.y+dy;
+
+if(map[ny][nx]==0){
+player.x=nx;
+player.y=ny;
+}
+
+}
+
+function attack(){
+
+monsters.forEach(m=>{
+if(Math.abs(m.x-player.x)<=1 && Math.abs(m.y-player.y)<=1){
+m.hp-=10;
+}
+});
+
+}
+
+document.addEventListener("keydown",e=>{
+
+if(e.key=="w") move(0,-1);
+if(e.key=="s") move(0,1);
+if(e.key=="a") move(-1,0);
+if(e.key=="d") move(1,0);
+
+if(e.code=="Space") attack();
+
+});
+
+function loop(){
+draw();
+requestAnimationFrame(loop);
+}
+
+loop();
+
+</script>
+
+</body>
+</html>
